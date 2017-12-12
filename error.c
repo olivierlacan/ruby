@@ -806,6 +806,7 @@ VALUE rb_eStandardError;
 VALUE rb_eRuntimeError;
 VALUE rb_eTypeError;
 VALUE rb_eArgError;
+VALUE rb_eKwArgError;
 VALUE rb_eIndexError;
 VALUE rb_eKeyError;
 VALUE rb_eRangeError;
@@ -1809,6 +1810,9 @@ syserr_eqq(VALUE self, VALUE exc)
  *
  *     LoadError: no such file to load -- does/not/exist
  *
+ *  This is because when raise is not given a specific exception class,
+ *  it defaults to a RuntimeError which inherits from StandardError
+ *  while LoadError doesn't.
  */
 
 /*
@@ -2008,6 +2012,9 @@ syserr_eqq(VALUE self, VALUE exc)
  *  <em>raises the exception:</em>
  *
  *     NoMethodError: undefined method `to_ary' for "hello":String
+ *
+ *  This is often raised when a method is called on a nil receiver
+ *  object.
  */
 
 /*
@@ -2149,6 +2156,7 @@ syserr_eqq(VALUE self, VALUE exc)
  *  * StandardError -- default for +rescue+
  *    * ArgumentError
  *      * UncaughtThrowError
+*       * KeywordArgumentError
  *    * EncodingError
  *    * FiberError
  *    * IOError
@@ -2201,6 +2209,7 @@ Init_Exception(void)
     rb_eStandardError = rb_define_class("StandardError", rb_eException);
     rb_eTypeError     = rb_define_class("TypeError", rb_eStandardError);
     rb_eArgError      = rb_define_class("ArgumentError", rb_eStandardError);
+    rb_eKwArgError    = rb_define_class("KeywordArgumentError", rb_eArgError);
     rb_eIndexError    = rb_define_class("IndexError", rb_eStandardError);
     rb_eKeyError      = rb_define_class("KeyError", rb_eIndexError);
     rb_define_method(rb_eKeyError, "receiver", key_err_receiver, 0);
